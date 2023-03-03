@@ -12,10 +12,42 @@
 #macro cc_light $51abcf // 207, 171, 81 (cfab51)
 #macro cc_white $FFFFFF // 255, 255, 255 (FFFFFF)
 
-global.coloursValues = [[0, 0, 0], [33, 11, 27], [77, 34, 44], [157, 101, 76], [207, 171, 81], [255, 255, 255] ];
+global.coloursValues = 
+[
+	[
+		colour_get_red(		cc_black		),
+		colour_get_green(	cc_black		),
+		colour_get_blue(	cc_black		),
+	], 
+	[
+		colour_get_red(		cc_brown		),
+		colour_get_green(	cc_brown		),
+		colour_get_blue(	cc_brown		),
+	], 
+	[
+		colour_get_red(		cc_dark		),
+		colour_get_green(	cc_dark		),
+		colour_get_blue(	cc_dark		),
+	], 
+	[
+		colour_get_red(		cc_fair		),
+		colour_get_green(	cc_fair		),
+		colour_get_blue(	cc_fair		),
+	], 
+	[
+		colour_get_red(		cc_light		),
+		colour_get_green(	cc_light		),
+		colour_get_blue(	cc_light		),
+	], 
+	[
+		colour_get_red(		cc_white		),
+		colour_get_green(	cc_white		),
+		colour_get_blue(	cc_white		),
+	], 
+];
 
 global.ccArr = [cc_black, cc_brown, cc_dark, cc_fair, cc_light, cc_white];
-global.colourMap = [0, 1, 2, 3, 4, 5];
+global.colourMap = array_create(array_length(global.ccArr), 0);
 
 function colours()
 {
@@ -36,19 +68,19 @@ function colours()
 
 function predraw_colour()
 {
-	shader_set_uniform_f(oInit.shHandleColourReplacementBlack, global.coloursValues[global.colourMap[0]][0] / 255, global.coloursValues[global.colourMap[0]][1] / 255, global.coloursValues[global.colourMap[0]][2] / 255, 1);
-	shader_set_uniform_f(oInit.shHandleColourReplacementDarkest, global.coloursValues[global.colourMap[1]][0] / 255, global.coloursValues[global.colourMap[1]][1] / 255, global.coloursValues[global.colourMap[1]][2] / 255, 1);
-	shader_set_uniform_f(oInit.shHandleColourReplacementDarker, global.coloursValues[global.colourMap[2]][0] / 255, global.coloursValues[global.colourMap[2]][1] / 255, global.coloursValues[global.colourMap[2]][2] / 255, 1);
-	shader_set_uniform_f(oInit.shHandleColourReplacementBrighter, global.coloursValues[global.colourMap[3]][0] / 255, global.coloursValues[global.colourMap[3]][1] / 255, global.coloursValues[global.colourMap[3]][2] / 255, 1);
-	shader_set_uniform_f(oInit.shHandleColourReplacementBrighest, global.coloursValues[global.colourMap[4]][0] / 255, global.coloursValues[global.colourMap[4]][1] / 255, global.coloursValues[global.colourMap[4]][2] / 255, 1);
-	shader_set_uniform_f(oInit.shHandleColourReplacementWhite, global.coloursValues[global.colourMap[5]][0] / 255, global.coloursValues[global.colourMap[5]][1] / 255, global.coloursValues[global.colourMap[5]][2] / 255, 1);
+	shader_set_uniform_f(oInit.shHandleColourReplacementBlack,		global.coloursValues[global.colourMap[0]][0] / 255, global.coloursValues[global.colourMap[0]][1] / 255, global.coloursValues[global.colourMap[0]][2] / 255, 1);
+	shader_set_uniform_f(oInit.shHandleColourReplacementDarkest,	global.coloursValues[global.colourMap[1]][0] / 255, global.coloursValues[global.colourMap[1]][1] / 255, global.coloursValues[global.colourMap[1]][2] / 255, 1);
+	shader_set_uniform_f(oInit.shHandleColourReplacementDarker,		global.coloursValues[global.colourMap[2]][0] / 255, global.coloursValues[global.colourMap[2]][1] / 255, global.coloursValues[global.colourMap[2]][2] / 255, 1);
+	shader_set_uniform_f(oInit.shHandleColourReplacementBrighter,	global.coloursValues[global.colourMap[3]][0] / 255, global.coloursValues[global.colourMap[3]][1] / 255, global.coloursValues[global.colourMap[3]][2] / 255, 1);
+	shader_set_uniform_f(oInit.shHandleColourReplacementBrighest,	global.coloursValues[global.colourMap[4]][0] / 255, global.coloursValues[global.colourMap[4]][1] / 255, global.coloursValues[global.colourMap[4]][2] / 255, 1);
+	shader_set_uniform_f(oInit.shHandleColourReplacementWhite,		global.coloursValues[global.colourMap[5]][0] / 255, global.coloursValues[global.colourMap[5]][1] / 255, global.coloursValues[global.colourMap[5]][2] / 255, 1);
 	
-	shader_set_uniform_f(oInit.shHandleColourBlack, global.coloursValues[0][0] / 255, global.coloursValues[0][1] / 255, global.coloursValues[0][2] / 255, 1);
-	shader_set_uniform_f(oInit.shHandleColourDarkest, global.coloursValues[1][0] / 255, global.coloursValues[1][1] / 255, global.coloursValues[1][2] / 255, 1);
-	shader_set_uniform_f(oInit.shHandleColourDarker, global.coloursValues[2][0] / 255, global.coloursValues[2][1] / 255, global.coloursValues[2][2] / 255, 1);
-	shader_set_uniform_f(oInit.shHandleColourBrighter, global.coloursValues[3][0] / 255, global.coloursValues[3][1] / 255, global.coloursValues[3][2] / 255, 1);
-	shader_set_uniform_f(oInit.shHandleColourBrighest, global.coloursValues[4][0] / 255, global.coloursValues[4][1] / 255, global.coloursValues[4][2] / 255, 1);
-	shader_set_uniform_f(oInit.shHandleColourWhite, global.coloursValues[5][0] / 255, global.coloursValues[5][1] / 255, global.coloursValues[5][2] / 255, 1);
+	shader_set_uniform_f(oInit.shHandleColourBlack,		 global.coloursValues[0][0] / 255, global.coloursValues[0][1] / 255, global.coloursValues[0][2] / 255, 1);
+	shader_set_uniform_f(oInit.shHandleColourDarkest,	 global.coloursValues[1][0] / 255, global.coloursValues[1][1] / 255, global.coloursValues[1][2] / 255, 1);
+	shader_set_uniform_f(oInit.shHandleColourDarker,	 global.coloursValues[2][0] / 255, global.coloursValues[2][1] / 255, global.coloursValues[2][2] / 255, 1);
+	shader_set_uniform_f(oInit.shHandleColourBrighter,	 global.coloursValues[3][0] / 255, global.coloursValues[3][1] / 255, global.coloursValues[3][2] / 255, 1);
+	shader_set_uniform_f(oInit.shHandleColourBrighest,	 global.coloursValues[4][0] / 255, global.coloursValues[4][1] / 255, global.coloursValues[4][2] / 255, 1);
+	shader_set_uniform_f(oInit.shHandleColourWhite,		 global.coloursValues[5][0] / 255, global.coloursValues[5][1] / 255, global.coloursValues[5][2] / 255, 1);
 }
 
 /* 

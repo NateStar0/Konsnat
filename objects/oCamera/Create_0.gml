@@ -3,9 +3,20 @@
 enum camera_state
 {
 	free,
+	slide,
 	scroll,
 	lock
 }
+
+enum colour_states
+{
+	toBlack,
+	normal,
+	toWhite,
+	reset
+}
+
+colour_state = colour_states.normal;
 
 state = camera_state.free;
 restore_state = state;
@@ -66,6 +77,29 @@ states =
 	
 	function()
 	{
+		if(instance_exists(follow))
+		{
+			xTo = follow.x + offset_x
+			follow_yview = (follow.y div VW_HEIGHT) * VW_HEIGHT
+		}
+		
+		
+		
+		x += ((xTo - x) / 6) + random_range(-shake_rem, shake_rem);
+		y = approach(y, follow_yview, slidespd) + random_range(-shake_rem, shake_rem);
+		
+		y = clamp(y, 0, room_height - VW_HEIGHT);
+		
+		shake_rem = max(0, shake_rem  - ((1 / shake_len) * shake_mag));
+
+		//x = clamp(x, view_w_half + buff, room_width - view_w_half - buff)
+		//y = clamp(y, view_h_half + buff, room_height - view_h_half - buff)
+
+		camera_set_view_pos(cam, floor(x - view_w_half), y);
+	},
+	
+	function()
+	{
 		// Using div looks quite strange, doesnt it? That's actually for integer rounding
 
 		follow_xview = (follow.x div VW_WIDTH) * VW_WIDTH
@@ -88,6 +122,45 @@ states =
 		camera_set_view_pos(cam, x, y);
 	}
 ]
+
+colourTransition = function(colState)
+{
+	var reset = 10;
+	static timer = 10;	
+	
+	timer = max(timer - 1, 0);
+	
+	if(!timer)
+	{
+		for(var i = 0; i < array_length(global.colourMap); i++)
+		{
+			switch(colState)
+			{
+				case colour_states.toBlack:
+					global.colourMap[i]--// = max(global.colourMap[i] - 1, 0);
+				break;
+			
+				case colour_states.toWhite:
+					// Broken???????
+					global.colourMap[i]++// = min(global.colourMap[i] + 1, array_length(global.colourMap) - 1)
+				break;
+			
+				case colour_states.normal:
+					global.colourMap[i] = approach(global.colourMap[i], i, 1)
+				break;
+				
+				case colour_states.reset:
+					global.colourMap[i] = i;
+					oCamera.colour_state = colour_states.reset;
+				break;
+			}
+			
+			global.colourMap[i] = clamp(global.colourMap[i], 0, array_length(global.colourMap) - 1)
+		}
+		
+		timer = reset;	
+	}
+}
 
 /**
 @description manages activation and deactivation of objects for optimisation

@@ -1,8 +1,9 @@
 /// @description 
 
-oCamera.state = camera_state.lock;
+oCamera.x = VW_WIDTH;
 oCamera.y = 0;
+oCamera.state = camera_state.lock;
 
-oKons.has_control = false;
+oKons.hasControl = false;
 oKons.visible = false;
 

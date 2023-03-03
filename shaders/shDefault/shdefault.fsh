@@ -23,12 +23,52 @@ void main()
 {
 	vec4 unmodifiedColour = v_vColour * texture2D( gm_BaseTexture, v_vTexcoord);
 	
-	if(unmodifiedColour.rgb == colourBlack.rgb) unmodifiedColour.rgb = colourReplacementBlack.rgb;
-	if(unmodifiedColour.rgb == colourDarkest.rgb) unmodifiedColour.rgb = colourReplacementDarkest.rgb;
-	if(unmodifiedColour.rgb == colourDarker.rgb) unmodifiedColour.rgb = colourReplacementDarker.rgb;
-	if(unmodifiedColour.rgb == colourBrighter.rgb) unmodifiedColour.rgb = colourReplacementBrighter.rgb;
-	if(unmodifiedColour.rgb == colourBrighest.rgb) unmodifiedColour.rgb = colourReplacementBrighest.rgb;
-	if(unmodifiedColour.rgb == colourWhite.rgb) unmodifiedColour.rgb = colourReplacementWhite.rgb;
+	if(unmodifiedColour.a > 0.0)
+	{
+		if(unmodifiedColour.rgb == colourBlack.rgb) 
+		{
+			unmodifiedColour.rgb = colourReplacementBlack.rgb;
+			
+			gl_FragColor = unmodifiedColour; 
+			return;
+		}
+		
+		if(unmodifiedColour.rgb == colourDarkest.rgb)
+		{
+			unmodifiedColour.rgb = colourReplacementDarkest.rgb;
+			gl_FragColor = unmodifiedColour;
+			return;
+		}
+		
+		if(unmodifiedColour.rgb == colourDarker.rgb)
+		{
+			unmodifiedColour.rgb = colourReplacementDarker.rgb;
+			gl_FragColor = unmodifiedColour;
+			return;
+		}
+		
+		if(unmodifiedColour.rgb == colourBrighter.rgb)
+		{
+			unmodifiedColour.rgb = colourReplacementBrighter.rgb;
+			gl_FragColor = unmodifiedColour;
+			return;
+		}
+		
+		if(unmodifiedColour.rgb == colourBrighest.rgb) 
+		{
+			unmodifiedColour.rgb = colourReplacementBrighest.rgb;
+			gl_FragColor = unmodifiedColour;
+			return;
+		}
+		
+		if(unmodifiedColour.rgb == colourWhite.rgb) 
+		{
+			unmodifiedColour.rgb = colourReplacementWhite.rgb;
+			
+			gl_FragColor = unmodifiedColour;
+			return;
+		}
+	}
 	
 	gl_FragColor = unmodifiedColour;
 }

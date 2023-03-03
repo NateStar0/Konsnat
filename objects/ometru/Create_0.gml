@@ -2,22 +2,25 @@
 
 depth = -10000.00;
 
+oCamera.x = VW_WIDTH;
+oCamera.y = 0;
+oCamera.state = camera_state.lock;
+
 global.pausable = false;
 
-toggle_mute = function () 
+toggleMute = function () 
 { 
 	global.mute = !global.mute;
 	menu[index].txt = global.mute ? "Muted" : "Mute";
 }
 
-render_leaderboard = function()
+renderLeaderboard = function()
 {
 	
 }
 
-change_menu = function()
+changeMenu = function()
 {
-	log(menu, global.input)
 	menu = pages[menu[index].close]
 	index = 0;
 	timer = seconds(0.1);
@@ -27,8 +30,9 @@ change_menu = function()
 
 start = function()
 {
-	log(global.input, index)
-	generate.init();	
+	oCamera.colour_state = colour_states.toBlack;
+	instance_create_depth(x, y, depth, oGenerator);
+	//generate.init();	
 }
 
 /**
@@ -44,14 +48,14 @@ pages =
 [
 	[
 		new item("Play", start, 0),
-		new item("Leaderboard", render_leaderboard, 1),
-		new item("Options", change_menu, 1),
+		//new item("Leaderboard", renderLeaderboard, 1),
+		new item("Options", changeMenu, 1),
 		new item("Exit", game_end, 0)
 	],
 	
 	[
-		new item(global.mute ? "Muted" : "Mute", toggle_mute, 1),
-		new item("Back", change_menu, 0)
+		new item(global.mute ? "Muted" : "Mute", toggleMute, 1),
+		new item("Back", changeMenu, 0)
 	]
 ]
 
@@ -67,13 +71,11 @@ spd = 4;
 timer = seconds(0.1);
 go = true;
 
-channel_changespeed = animcurve_get_channel(cMenu, "main");
-
 render = function ()
 {
 	var input = global.input;
-	var dir = (input[3][inp.press] - input[2][inp.press]);
-	var commit = (input[0][inp.press] || input[1][inp.press]);
+	var dir = (input[3][INPUTTYPE.PRESS] - input[2][INPUTTYPE.PRESS]);
+	var commit = (input[0][INPUTTYPE.PRESS] || input[1][INPUTTYPE.PRESS]);
 	
 	go = true;
 	

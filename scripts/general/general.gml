@@ -62,7 +62,7 @@ function instance_place_array(x, y, object)
 
 function approach(start, final, shift) 
 {
-	return (start < final) ? min(start + shift, final) : max(start - shift, final);
+	return (start != final) ? ((start < final) ? min(start + shift, final) : max(start - shift, final)) : start;
 }
 
 /**
@@ -105,36 +105,6 @@ function log()
 	show_debug_message(str);
 }
 
-/// @function split(substr, str, ignoreEmptyStrings)
-/// @param {string} substr The substring to cut on
-/// @param {string} str The whole string
-/// @param {bool} ignoreEmptyStrings Ignore empty elements (true) or (false)
-///
-/// @description	Splits the str on the given substring and returns an array
-/// @date			2021-01-17
-/// @copyright		Appsurd
-function split(substr, str, ignoreEmptyStrings) {
-
-	var substrl = string_length(substr);
-	var slot = 0;
-	var d_pos = 0; // Position for loop
-	var array_sample = []; // Initialise total array
-	var d_count = string_count(substr, str); // How many values within string
-
-	str += substr; // Add the substr extra to the end of str
-
-	for(var i=0; i<=d_count; i++)
-	{
-	    d_pos = string_pos(substr, str)+(substrl-1); // End position of current value
-	    var copy = string_copy(str, 1, d_pos-substrl); 
-	    if copy != "" || ignoreEmptyStrings = false then array_sample[i-slot] = copy; // Copy string section to array
-	    else slot++; // Except if ignoreEmptyStrings was set to true
-	    str = string_delete(str, 1, d_pos); // Delete string section from original sample
-	}
-	
-	return array_sample;
-}
-
 /**
 @desc Returns the provided string with a capital letter in the first index.
 @param {String} str
@@ -146,5 +116,36 @@ function upperfirst(str)
     return string_upper(string_char_at(str, 1)) + string_copy(str, 2, string_length(str) - 1);
 }
 
+function pick_weighted(arr)
+{
+	
+	var itemN = 0;
+	var itemCount = array_length(arr);
+	var items = array_create(itemCount);
+	var cmf = array_create(itemCount);
+	var total = 0;
+	var i = 0;
+		
+	repeat (itemCount) 
+	{
+		items[itemN] = arr[i][0];
+		total += arr[i][1];
+		cmf[itemN] = total;
+		itemN++;
+		i++
+	}
+	
+	var rand = random(total);
+	
+	for (var j = 0; j < itemCount; j++) 
+	{
+		if (rand < cmf[j]) 
+		{
+			return items[j];
+		}
+	}
+	
+	return items[itemCount - 1];
+}
 
 

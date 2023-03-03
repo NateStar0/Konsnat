@@ -36,15 +36,15 @@ draw_set_font(font);
 
 //		--- Input management ---
 
-global.input = array_create(8, array_create(2, 0));
+global.input = [];
 
 keys = [ord("W"), ord("S"), ord("A"), ord("D"), ord("E"), ord("Q"), vk_escape, vk_tab]
 
-enum inp
+enum INPUTTYPE
 {
-	press, 
-	hold,
-	release
+	PRESS, 
+	HOLD,
+	RELEASE
 }
 
 //		--- Misc ---

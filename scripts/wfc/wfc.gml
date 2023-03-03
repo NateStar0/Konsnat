@@ -219,34 +219,6 @@ function array_create_2d(w, h, fill)
 	return arr;
 }
 
-function pick_weighted(arr)
-{
-	
-	var item_n = 0,
-	    items_count = array_length(arr),
-	    items = array_create(items_count),
-	    cmf = array_create(items_count),
-	    total = 0,
-	    i = 0;
-		
-	repeat (items_count) 
-	{
-	  items[item_n] = arr[i][0];
-	  total += arr[i][1];
-	  cmf[item_n] = total;
-	  item_n++;
-	  i++
-	}
-	
-	var rand = random(total);
-	for (var j = 0; j < items_count; j++) {
-	  if (rand < cmf[j]) {
-	    return items[j];
-	  }
-	}
-	return items[items_count - 1];
-}
-
 //wfc(sMenuTrain, 48, 5);
 
 randomise()

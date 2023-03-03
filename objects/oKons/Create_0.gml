@@ -1,6 +1,6 @@
 /// @description Run everything
 
-//has_control = true;
+//hasControl = true;
 
 image_xscale = 1;
 image_speed = 1;
@@ -131,7 +131,7 @@ abilities = function ()
 		}
 		else
 		{
-			ability_data.shard.angle += (throwing) ?  (in[3][inp.hold] - in[2][inp.hold]) * -ability_data.shard.rotspd : ability_data.shard.rotspd;
+			ability_data.shard.angle += (throwing) ?  (in[3][INPUTTYPE.HOLD] - in[2][INPUTTYPE.HOLD]) * -ability_data.shard.rotspd : ability_data.shard.rotspd;
 			ability_data.shard.x = x;
 			ability_data.shard.y = y;
 			
@@ -144,24 +144,25 @@ abilities = function ()
 			oCamera.state = (throwing) ? camera_state.free : oCamera.restore_state;
 		}
 		
-		if((in[1][inp.release]))
+		if((in[1][INPUTTYPE.RELEASE]))
 		{
 			ability_data.shard.thrown = true;
+			shake_cam(3, 5);
 		}
 	}
 }
 
 run = function ()
 {
-	if(!has_control) exit;
+	if(!hasControl) exit;
 	
 	var in = global.input;
-	var dir = (in[3][inp.hold] - in[2][inp.hold]);
+	var dir = (in[3][INPUTTYPE.HOLD] - in[2][INPUTTYPE.HOLD]);
 	
 	onground = place_meeting(x, y + 1, pWall);
 	onwall = place_meeting(x + 1, y, pWall) - place_meeting(x - 1, y, pWall);
 	
-	throwing = in[1][inp.hold];
+	throwing = in[1][INPUTTYPE.HOLD];
 	
 	jumpdelay = max(0, jumpdelay - 1);
 	if(jumpdelay == 0)
@@ -172,7 +173,7 @@ run = function ()
 		spd.hsp.val = clamp((dir == 0) ? approach(spd.hsp.val, 0, (onground) ? spd.hsp.fric.onground : spd.hsp.fric.offground) : spd.hsp.val, -hmx, hmx);
 	}
 	
-	if(onwall != 0 && !onground && (in[0][inp.hold]))
+	if(onwall != 0 && !onground && (in[0][INPUTTYPE.HOLD]))
 	{
 		spd.hsp.val = -onwall * spd.hsp.jmp;
 		spd.vsp.val = spd.vsp.boost.onwall
@@ -183,13 +184,13 @@ run = function ()
 		jumpdelay = jumpdelaymx
 	}
 	
-	spd.vsp.val += (onwall == 0) ? spd.vsp.grav.offwall : spd.vsp.grav.offwall;
+	spd.vsp.val += (!onground) ? ((onwall == 0) ? spd.vsp.grav.offwall : spd.vsp.grav.offwall) : 0;
 	
 	if(jumpbuffer > 0)
 	{
 		jumpbuffer--;
 		
-		if(in[0][inp.hold])
+		if(in[0][INPUTTYPE.HOLD])
 		{
 			jumpbuffer = 0;
 			spd.vsp.val = spd.vsp.boost.offwall;
@@ -232,6 +233,8 @@ run = function ()
 		
 		spd.vsp.val = 0;
 		spd.vsp.frc = 0;
+		
+		shake_cam(3, 5);
 	}
 	
 	y += spd.vsp.val;

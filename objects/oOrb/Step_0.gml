@@ -21,9 +21,9 @@ if(collected)
 		
 		dist = startdist
 
-		angle += (in[1][inp.hold]) ? (in[3][inp.hold] - in[2][inp.hold]) * rotspd : rotspd
+		angle += (in[1][INPUTTYPE.HOLD]) ? (in[3][INPUTTYPE.HOLD] - in[2][INPUTTYPE.HOLD]) * rotspd : rotspd
 		
-		if(in[1][inp.hold])
+		if(in[1][INPUTTYPE.HOLD])
 		{
 			oCamera.offset_x = lengthdir_x(48, angle)	
 			oCamera.offset_y = lengthdir_y(48, angle)	
@@ -76,7 +76,7 @@ if(collected)
 	x = lx + lengthdir_x(dist, angle);
 	y = ly + lengthdir_y(dist, angle);
 	
-	if((in[1][inp.release]))
+	if((in[1][INPUTTYPE.RELEASE]))
 	{
 		thrown = true;
 		

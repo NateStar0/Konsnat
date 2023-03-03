@@ -1,7 +1,9 @@
 
 
 #macro generate global.generation
-global.level_grid = undefined;
+global.levelGrid = undefined;
+
+global.levelElevator = -1;
 
 global.generation = 
 {
@@ -9,7 +11,8 @@ global.generation =
 	{
 		var w = array_length(arr);
 		var h = array_length(arr[0]);
-		var surf = surface_create(w, h);
+		var surf = surface_create(w * 3, h * 3);
+		var altSurf = surface_create(w, h);
 		var shd = shader_current();
 		
 		shader_reset();
@@ -19,9 +22,35 @@ global.generation =
 		{
 			for(var j = 0; j < h; j++)
 			{
-				if(arr[i][j] != -1)
+				if(arr[i][j] != -1 && arr[i][j] != undefined)
 				{
-					draw_set_colour(make_colour_rgb(arr[i][j][0] * 16, arr[i][j][1] * 16, arr[i][j][2] * 255));
+					draw_set_colour(make_colour_rgb(arr[i][j].conditions.risk * 16, arr[i][j].conditions.reward * 16, arr[i][j].conditions.mobility * 16));
+					
+					if(arr[i][j].neighbours.left) draw_point(i * 3, j * 3 + 1);	
+					if(arr[i][j].neighbours.right) draw_point(i * 3 + 2, j * 3 + 1);	
+					if(arr[i][j].neighbours.up) draw_point(i * 3 + 1, j * 3);	
+					if(arr[i][j].neighbours.down) draw_point(i * 3 + 1, j * 3 + 2);	
+					
+					draw_point(i * 3 + 1, j * 3 + 1);	
+				}
+			}
+		}
+		
+		surface_reset_target();
+		shader_set(shd);
+		
+		
+		shader_reset();
+		surface_set_target(altSurf);
+		
+		for(var i = 0; i < w; i++)
+		{
+			for(var j = 0; j < h; j++)
+			{
+				if(arr[i][j] != -1 && arr[i][j] != undefined)
+				{
+					draw_set_colour(make_colour_rgb(arr[i][j].conditions.risk * 16, arr[i][j].conditions.reward * 16, arr[i][j].conditions.mobility * 16));
+					
 					draw_point(i, j);	
 				}
 			}
@@ -30,72 +59,183 @@ global.generation =
 		surface_reset_target();
 		shader_set(shd);
 		
+		surface_save(altSurf, "ALT" + file); //*/
+		
 		surface_save(surf, file)
 	},
 	
 	init : function()
 	{
-		
+		// Misc EXT stuff
 		global.pausable = true;
 		
-		oKons.has_control = true;
-		//oKons.y = 300;
+		oKons.hasControl = true;
+		oKons.x = 1104;
 		oKons.visible = true;
 			
-		oCamera.state = camera_state.free;
-		oCamera.follow = oKons;
-		
+		oCamera.x = 960;
+
+		// Configuration		
 		var width = 11
 		var height = 22
 		
 		var count = 0;
 		
-		global.level_grid = array_create(width);
+		// Create grid
+		global.levelGrid = array_create(width);
 		
 		for(var i = 0; i < width; i++)
 		{
-			global.level_grid[i] = array_create(height, -1);	
+			global.levelGrid[i] = array_create(height, -1);	
 		}
 		
-		// Create Level Layout
+		// Define a cell
 		
-		function trim_structure(x, y, width, height)
+		/**
+		@param {Struct} _neighbours 
+		@param {Struct} _conditions 
+		@param {Bool} _isBoss
+		
+		@return {Struct}
+		*/
+		
+		function gridCell(_neighbours, _conditions, _isBoss=false) constructor
+		{
+			neighbours = _neighbours;
+			conditions = _conditions;
+			isBoss = _isBoss;
+			
+			instances = [];
+			
+			static clearInstances = function()
+			{
+				for(var i = 0; i < array_length(instances); i++)
+				{
+					with(instances[i])
+					{
+						instance_destroy();	
+					}
+				}
+			}
+		}
+		
+		// Define the conditions constructor
+		
+		/**
+		@param {Real}	_risk;
+		@param {Real}	_reward;
+		@param {Real}	_mobility
+		
+		@return {Struct}
+		*/
+		
+		function cellConditions(_risk, _reward, _mobility) constructor
+		{
+			risk = _risk;
+			reward = _reward;
+			mobility = _mobility
+		}
+		
+		// Define the neighbours constructor
+		
+		/**
+		@param {Real} _up
+		@param {Real} _down
+		@param {Real} _left
+		@param {Real} _right
+		
+		@return {Struct}
+		*/
+		
+		function cellNeighbours(_up, _down, _left, _right) constructor
+		{
+			up = _up;
+			down = _down;
+			left = _left;
+			right = _right;
+		}
+		
+		// Create connection structure
+		
+		/**
+		@desc Recursive structural generation
+
+		@param {Real}		x 
+		@param {Real}		y
+		@param {Real}		width
+		@param {Real}		height
+		@param {Struct}		n
+
+		@return {undefined}
+
+		*/
+		
+		function structureRec(x, y, width, height, n)
 		{
 			// Create Risk bias & Reward Bias
-			global.level_grid[x][y] = [max(0, y + irandom_range(-2, 2)), choose(1, 1, 1, 1, 2, 2, 2, 3), 0];
+			var risk = max(0, height - y + irandom_range(-4, 4));
+			var reward = (y > ((5 / 8) * height)) ? irandom_range(0, 5) : irandom_range(6, 15);
+			var mobility = 0;
 			
+			var neighbours = n;
+			
+			global.levelGrid[x][y] = new gridCell(neighbours, new cellConditions(risk, reward, mobility));
+												
 			// Will wall left/right
-			if(chance(0.8))
+			if(chance(0.95))
 			{
-				if(chance(0.45) && (x - 1 >= 0) && global.level_grid[x - 1][y] == -1) trim_structure(x - 1, y, width, height);	
-				if(chance(0.45) && (x + 1 < width) && global.level_grid[x + 1][y] == -1) trim_structure(x + 1, y, width, height);	
+				if(chance(0.5) && (x - 1 >= 0) && global.levelGrid[x - 1][y] == -1)
+				{	
+					var b = choose(1, 2);
+					global.levelGrid[x][y].neighbours.left = b;
+					structureRec(x - 1, y, width, height, new cellNeighbours(0, 0, 0, b));	
+				}
+				
+				if(chance(0.5) && (x + 1 < width) && global.levelGrid[x + 1][y] == -1)
+				{
+					var b = choose(1, 2);
+					global.levelGrid[x][y].neighbours.right = b;
+					structureRec(x + 1, y, width, height, new cellNeighbours(0, 0, b, 0));	
+				}
 			}
 			
-			if(chance(0.5) && (y - 1 >= 0) && global.level_grid[x][y - 1] == -1) trim_structure(x, y - 1, width, height);	
+			if(chance(0.30) && (y - 1 >= 0) && global.levelGrid[x][y - 1] == -1)
+			{
+				var b = choose(1, 2);
+				global.levelGrid[x][y].neighbours.up = b;
+				structureRec(x, y - 1, width, height, new cellNeighbours(0, b, 0, 0));
+			}
 			
 			return;
 		}
 		
-		trim_structure(width / 2 - 0.5, height - 1, width, height);
+		// Run structure generator
+		
+		structureRec(width / 2 - 0.5, height - 1, width, height, new cellNeighbours(0, 0, 0, 0));
+		
+		global.levelGrid[width / 2 - 0.5][height - 1].conditions = new cellConditions(0, 0, 15);
+		
+		// Go further
 		
 		var heights = array_create(width, 0);
-		var picked_start = false;
+		var pickedBoss = false;
 		
 		for(var j = 0; j < height; j++)	
 		{
 			for(var i = 0; i < width; i++)
 			{
-				if(global.level_grid[i][j] != -1)
+				if(global.levelGrid[i][j] != -1)
 				{
 					count++;
 					
 					heights[i]++;
 					
-					if(!picked_start && chance(0.2))
+					if(!pickedBoss && chance(0.5))
 					{
-						log(i, j, picked_start)
-						global.level_grid[i][j] = [16, 16, 1, true];
-						picked_start = true;	
+						global.levelGrid[i][j].isBoss = true;
+						global.levelGrid[i][j].conditions = new cellConditions(15, 15, 15);
+						pickedBoss = true;	
+						break;
 					}
 				}
 			}
@@ -104,30 +244,55 @@ global.generation =
 		var longest = 0;
 		for(var i = 0; i < width; i++)
 		{
-			if(heights[i] > heights[longest])
+			if(heights[i] > heights[longest] && i != (width / 2 - 0.5))
 			{
 				longest = i;	
 			}
 		}
 		
+		global.levelElevator = longest;
+		
+		var go = false;
+		
 		for(var i = 0; i < height; i++)
 		{
-			if(global.level_grid[longest][i] != -1)
+			if(global.levelGrid[longest][i] != -1)
 			{
-				global.level_grid[longest][i][2] = 1;
+				if(global.levelGrid[longest][i].isBoss)
+				{
+					self.init();
+					return;
+				}
+				
+				global.levelGrid[longest][i].conditions.mobility = 15;
+				global.levelGrid[longest][i].neighbours.up = go;
+				global.levelGrid[longest][i].neighbours.down = !(i == height - 1);
+				
+				go = true;
+			}
+			else
+			{
+				if(go)
+				{
+					var risk = max(0, height - i + irandom_range(-4, 4));
+					var reward = (i > ((5 / 8) * height)) ? irandom_range(0, 5) : irandom_range(6, 15);
+					var mobility = 15;
+			
+					var neighbours = new cellNeighbours(1, (i != height - 1), 0, 0)
+			
+					global.levelGrid[longest][i] = new gridCell(neighbours, new cellConditions(risk, reward, mobility));
+				}
 			}
 		}
 		
 		
-		if(count < 25 || !picked_start)
+		if(count < 30 || !pickedBoss)
 		{
 			self.init();
 			return;
 		}
 		
-		log(global.level_grid)
-		
-		self.dump(global.level_grid, "new.png");
+		self.dump(global.levelGrid, "new.png");
 		
 		self.build(width, height);
 	},
@@ -140,30 +305,70 @@ global.generation =
 		{
 			for(var j = 0; j < h; j++)
 			{
-				if(global.level_grid[i][j] != -1)
+				var tile = global.levelGrid[i][j];
+				
+				if(tile != -1)
 				{
-					var tile_data = 
+					var wall = undefined;
+					
+					var minX = i * VW_WIDTH;
+					var maxX = i * VW_WIDTH + VW_WIDTH;
+					
+					var minY = (j + 1) * VW_HEIGHT;
+					var maxY = (j + 1) * VW_HEIGHT + VW_HEIGHT;
+					
+					var neighbours = tile.neighbours;
+					
+					// This is not an empty tile.
+
+					array_push(tile.instances, instance_create_layer(minX, minY, "Instances_1", oCameraBounder));
+					
+					// Top wall
+					array_push(tile.instances, instance_create_layer(minX, minY, "Instances_1", oWall, { image_xscale : VW_WIDTH / 16, image_yscale : 2 }));
+					
+					// Floor wall
+					array_push(tile.instances, instance_create_layer(minX, maxY - (16 * 2), "Instances_1", oWall, { image_xscale : VW_WIDTH / 16, image_yscale : 2 }));
+					
+					// Left wall/door
+					
+					switch(neighbours.left)
 					{
-						risk : global.level_grid[i][j][0],
-						reward : global.level_grid[i][j][1],
-						isboss : array_length(global.level_grid[i][j]) > 3,
-						
-						x : i,
-						y : j,
-						
-						neighbours :
-						{
-							below : false,
-							above : false, 
-							left : false,
-							right : false
-						}
+						case 2: break;
+						case 1: array_push(tile.instances, instance_create_layer(minX, minY, "Instances_1", oWall, { image_xscale : 1, image_yscale : 6 })); break;
+						case 0: array_push(tile.instances, instance_create_layer(minX, minY, "Instances_1", oWall, { image_xscale : 1, image_yscale : VW_HEIGHT / 16 })); break;
 					}
 					
-					if(tile_data.isboss) log(tile_data)	
+					// Right wall/door
+					
+					switch(neighbours.right)
+					{
+						case 2: break;
+						case 1: array_push(tile.instances, instance_create_layer(maxX - 16, minY, "Instances_1", oWall, { image_xscale : 1, image_yscale : 6 })); break;
+						case 0: array_push(tile.instances, instance_create_layer(maxX - 16, minY, "Instances_1", oWall, { image_xscale : 1, image_yscale : VW_HEIGHT / 16 })); break;
+					}
+					
+					// Strairwell
+					
+					if(neighbours.up || neighbours.down)
+					{
+						array_push(tile.instances, instance_create_layer(minX + (maxX - minX) / 2, maxY - (16 * 5), "Instances_1", oStairwell, { canUp : neighbours.up, canDown : neighbours.down }));	
+					}
+					
+					// Fancy generation
+					
+					// Pretty pictures
 				}
 			}
 		}
+		
+		oKons.x = 5 * VW_WIDTH + (VW_WIDTH / 2);
+		oKons.y = 22 * VW_HEIGHT + 64;
+		
+		log(VW_HEIGHT)
+		
+		oCamera.state = camera_state.slide;
+		oCamera.follow_yview = (oCamera.follow.y div VW_HEIGHT) * VW_HEIGHT
+		oCamera.y = oCamera.follow_yview;
 	},
 	
 	reset : function()
@@ -173,4 +378,3 @@ global.generation =
 		// Recreate menu with preload state
 	}
 }
-

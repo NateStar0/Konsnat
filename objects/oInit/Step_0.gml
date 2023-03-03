@@ -14,7 +14,8 @@ if(keyboard_check_pressed(ord("P")))
 	room_restart();
 }
 
-if(keyboard_check_pressed(ord("R")))
+if(keyboard_check_pressed(ord("O")))
 {
-	wfc(sWFCTest2, 8, 8)
+	generate.init();
 }
+
