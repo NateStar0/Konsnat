@@ -6,6 +6,9 @@ oCamera.x = VW_WIDTH;
 oCamera.y = 0;
 oCamera.state = camera_state.lock;
 
+oKons.hasControl = false;
+oKons.visible = false;
+
 global.pausable = false;
 
 toggleMute = function () 
@@ -56,10 +59,14 @@ pages =
 	[
 		new item(global.mute ? "Muted" : "Mute", toggleMute, 1),
 		new item("Back", changeMenu, 0)
+	],
+	
+	[
+		new item("Konsnat", changeMenu, 0),
 	]
 ]
 
-menu = pages[0];
+menu = pages[2];
 
 index = 0;
 interp = VW_WIDTH + 32;

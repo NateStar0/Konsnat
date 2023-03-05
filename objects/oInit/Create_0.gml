@@ -38,7 +38,7 @@ draw_set_font(font);
 
 global.input = [];
 
-keys = [ord("W"), ord("S"), ord("A"), ord("D"), ord("E"), ord("Q"), vk_escape, vk_tab]
+keys = [ord("W"), ord("S"), ord("A"), ord("D"), ord("E"), ord("Q"), vk_escape, vk_tab];
 
 enum INPUTTYPE
 {

@@ -64,6 +64,22 @@ global.generation =
 		surface_save(surf, file)
 	},
 	
+	clear : function()
+	{
+		for(var i = 0; i < array_length(global.levelGrid); i++)
+		{
+			for(var j = 0; j < array_length(global.levelGrid[i]); j++)
+			{
+				if(global.levelGrid[i][j] != -1)
+				{
+					global.levelGrid[i][j].clearInstances();	
+				}
+			}
+		}
+		
+		global.levelGrid = undefined;
+	},
+	
 	init : function()
 	{
 		// Misc EXT stuff
@@ -80,6 +96,11 @@ global.generation =
 		var height = 22
 		
 		var count = 0;
+		
+		if(!is_undefined(global.levelGrid))
+		{
+			self.clear();	
+		}
 		
 		// Create grid
 		global.levelGrid = array_create(width);
@@ -109,9 +130,9 @@ global.generation =
 			
 			static clearInstances = function()
 			{
-				for(var i = 0; i < array_length(instances); i++)
+				for(var n = 0; n < array_length(instances); n++)
 				{
-					with(instances[i])
+					with(instances[n])
 					{
 						instance_destroy();	
 					}
@@ -230,7 +251,7 @@ global.generation =
 					
 					heights[i]++;
 					
-					if(!pickedBoss && chance(0.5))
+					if(!pickedBoss && chance(0.5) && !global.levelGrid[i][j].neighbours.up && !global.levelGrid[i][j].neighbours.down)
 					{
 						global.levelGrid[i][j].isBoss = true;
 						global.levelGrid[i][j].conditions = new cellConditions(15, 15, 15);
@@ -351,7 +372,15 @@ global.generation =
 					
 					if(neighbours.up || neighbours.down)
 					{
-						array_push(tile.instances, instance_create_layer(minX + (maxX - minX) / 2, maxY - (16 * 5), "Instances_1", oStairwell, { canUp : neighbours.up, canDown : neighbours.down }));	
+						if(tile.conditions.mobility == 15)
+						{
+							array_push(tile.instances, instance_create_layer(minX + (maxX - minX) / 4, maxY - (16 * 5), "Instances_1", oStairwell, { canUp : neighbours.up, canDown : neighbours.down, elevator : true }));	
+							array_push(tile.instances, instance_create_layer(maxX - (maxX - minX) / 4, maxY - (16 * 5), "Instances_1", oStairwell, { canUp : neighbours.up, canDown : neighbours.down, elevator : true }))
+						}
+						else
+						{
+							array_push(tile.instances, instance_create_layer(minX + (maxX - minX) / 2, maxY - (16 * 5), "Instances_1", oStairwell, { canUp : neighbours.up, canDown : neighbours.down, elevator : false }));	
+						}
 					}
 					
 					// Fancy generation

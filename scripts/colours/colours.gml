@@ -14,40 +14,30 @@
 
 global.coloursValues = 
 [
-	[
-		colour_get_red(		cc_black		),
-		colour_get_green(	cc_black		),
-		colour_get_blue(	cc_black		),
-	], 
-	[
-		colour_get_red(		cc_brown		),
-		colour_get_green(	cc_brown		),
-		colour_get_blue(	cc_brown		),
-	], 
-	[
-		colour_get_red(		cc_dark		),
-		colour_get_green(	cc_dark		),
-		colour_get_blue(	cc_dark		),
-	], 
-	[
-		colour_get_red(		cc_fair		),
-		colour_get_green(	cc_fair		),
-		colour_get_blue(	cc_fair		),
-	], 
-	[
-		colour_get_red(		cc_light		),
-		colour_get_green(	cc_light		),
-		colour_get_blue(	cc_light		),
-	], 
-	[
-		colour_get_red(		cc_white		),
-		colour_get_green(	cc_white		),
-		colour_get_blue(	cc_white		),
-	], 
+	colour_get_values(cc_black),
+	colour_get_values(cc_brown),
+	colour_get_values(cc_dark),
+	colour_get_values(cc_fair),
+	colour_get_values(cc_light),
+	colour_get_values(cc_white),
 ];
 
 global.ccArr = [cc_black, cc_brown, cc_dark, cc_fair, cc_light, cc_white];
 global.colourMap = array_create(array_length(global.ccArr), 0);
+
+/**
+@param {Any} colour
+@return {Array<Real>}
+*/
+
+function colour_get_values(colour)
+{
+	return [
+		colour_get_red(colour),
+		colour_get_green(colour),
+		colour_get_blue(colour)
+	]
+}
 
 function colours()
 {

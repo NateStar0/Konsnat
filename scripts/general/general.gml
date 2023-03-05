@@ -84,14 +84,14 @@ function wave(argument0, argument1, argument2, argument3)
 	return argument0 + a4 + sin((((current_time * 0.001)+ argument2 * argument3)/ argument2)* (pi*2))+a4
 }
 
-function seconds(argument0) {
-	return argument0 * game_get_speed(gamespeed_fps);
+function seconds(frames) {
+	return frames * game_get_speed(gamespeed_fps);
 }
 
-function camera_set_target(argument0) {
+function camera_set_target(target) {
 	with(oCamera)
 	{
-		follow = argument0
+		follow = target
 	}
 }
 

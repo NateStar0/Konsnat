@@ -1,4 +1,4 @@
-/// @description Run global code
+/// @description 
 
 for(var i = 0; i < array_length(keys); i++)
 {
@@ -18,4 +18,3 @@ if(keyboard_check_pressed(ord("O")))
 {
 	generate.init();
 }
-

@@ -10,3 +10,6 @@ if(place_meeting(x, y, oKons))
 		if(global.input[1][INPUTTYPE.PRESS] && canDown) oKons.y += VW_HEIGHT;
 	}
 }
+
+image_index = elevator;
+

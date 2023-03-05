@@ -29,8 +29,8 @@
   "properties": [],
   "solid": false,
   "spriteId": {
-    "name": "sWaterfall",
-    "path": "sprites/sWaterfall/sWaterfall.yy",
+    "name": "sStairwell",
+    "path": "sprites/sStairwell/sStairwell.yy",
   },
   "spriteMaskId": null,
   "visible": true,
