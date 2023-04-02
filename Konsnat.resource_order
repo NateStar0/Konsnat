@@ -26,7 +26,7 @@
     {"name":"sWall","order":5,"path":"sprites/sWall/sWall.yy",},
     {"name":"sMenuFront","order":3,"path":"sprites/sMenuFront/sMenuFront.yy",},
     {"name":"oPause","order":1,"path":"objects/oPause/oPause.yy",},
-    {"name":"oInit","order":6,"path":"objects/oInit/oInit.yy",},
+    {"name":"oInit","order":5,"path":"objects/oInit/oInit.yy",},
     {"name":"global_override","order":4,"path":"scripts/global_override/global_override.yy",},
     {"name":"oWall","order":4,"path":"objects/oWall/oWall.yy",},
     {"name":"sWFCTest2","order":6,"path":"sprites/sWFCTest2/sWFCTest2.yy",},
@@ -52,7 +52,7 @@
     {"name":"sMenuBack","order":1,"path":"sprites/sMenuBack/sMenuBack.yy",},
     {"name":"wfc","order":5,"path":"scripts/wfc/wfc.yy",},
     {"name":"oKons","order":3,"path":"objects/oKons/oKons.yy",},
-    {"name":"oMetru","order":5,"path":"objects/oMetru/oMetru.yy",},
+    {"name":"oMetru","order":4,"path":"objects/oMetru/oMetru.yy",},
     {"name":"general","order":1,"path":"scripts/general/general.yy",},
   ],
 }

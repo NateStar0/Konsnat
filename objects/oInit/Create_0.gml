@@ -4,6 +4,8 @@
 
 show_debug_overlay(1)
 
+global.stage = 0;
+
 //		--- Colours ---
 
 colours();

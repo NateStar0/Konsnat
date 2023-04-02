@@ -11,6 +11,8 @@ oKons.visible = false;
 
 global.pausable = false;
 
+global.stage = 0;
+
 toggleMute = function () 
 { 
 	global.mute = !global.mute;

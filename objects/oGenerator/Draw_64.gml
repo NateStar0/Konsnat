@@ -1,9 +1,9 @@
 /// @description 
 
-var j = sprite_get_number(sMenuTrainChunk);
-for(var i = 0; i < j; i++)
+var l = sprite_get_number(sMenuTrainChunk);
+for(var i = 0; i < l; i++)
 {
-	draw_sprite(sMenuTrainChunk, i, 12, VW_HEIGHT - 12 - (round(((mx - timer) / mx) * j) == i))
+	draw_sprite(sMenuTrainChunk, i, 12, VW_HEIGHT - 12 - (round(((mx - timer) / mx) * l) == i))
 }
 
 if(global.levelGrid == undefined) exit;

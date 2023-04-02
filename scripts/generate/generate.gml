@@ -120,11 +120,13 @@ global.generation =
 		@return {Struct}
 		*/
 		
-		function gridCell(_neighbours, _conditions, _isBoss=false) constructor
+		function gridCell(_neighbours, _conditions) constructor
 		{
 			neighbours = _neighbours;
 			conditions = _conditions;
-			isBoss = _isBoss;
+			isBoss = false;
+			isStart = false;
+			isOrb = false
 			
 			instances = [];
 			
@@ -234,12 +236,14 @@ global.generation =
 		
 		structureRec(width / 2 - 0.5, height - 1, width, height, new cellNeighbours(0, 0, 0, 0));
 		
-		global.levelGrid[width / 2 - 0.5][height - 1].conditions = new cellConditions(0, 0, 15);
+		global.levelGrid[width / 2 - 0.5][height - 1].conditions = new cellConditions(0, 0, 14);
+		global.levelGrid[width / 2 - 0.5][height - 1].isStart = true;
 		
 		// Go further
 		
 		var heights = array_create(width, 0);
 		var pickedBoss = false;
+		var pickedOrb = false;
 		
 		for(var j = 0; j < height; j++)	
 		{
@@ -256,6 +260,23 @@ global.generation =
 						global.levelGrid[i][j].isBoss = true;
 						global.levelGrid[i][j].conditions = new cellConditions(15, 15, 15);
 						pickedBoss = true;	
+						break;
+					}
+				}
+			}
+		}
+		
+		for(var j = height - 1; j >= 0; j--)	
+		{
+			for(var i = 0; i < width; i++)
+			{
+				if(global.levelGrid[i][j] != -1)
+				{				
+					if(!pickedOrb && chance(0.5) && !global.levelGrid[i][j].isStart)
+					{
+						global.levelGrid[i][j].isOrb = true;
+						global.levelGrid[i][j].conditions = new cellConditions(0, 15, 14);
+						pickedOrb = true;	
 						break;
 					}
 				}
@@ -307,7 +328,7 @@ global.generation =
 		}
 		
 		
-		if(count < 30 || !pickedBoss)
+		if(count < 30 || !pickedBoss || !pickedOrb)
 		{
 			self.init();
 			return;
@@ -321,6 +342,8 @@ global.generation =
 	build : function(w, h)
 	{
 		//For every filled tile in the grid
+		
+		global.stage++;
 		
 		for(var i = 0; i < w; i++)
 		{
@@ -381,6 +404,13 @@ global.generation =
 						{
 							array_push(tile.instances, instance_create_layer(minX + (maxX - minX) / 2, maxY - (16 * 5), "Instances_1", oStairwell, { canUp : neighbours.up, canDown : neighbours.down, elevator : false }));	
 						}
+					}
+					
+					// Orb
+					
+					if(tile.isOrb)
+					{
+						instance_create_layer(maxX + (maxX - minX) / 4, maxY - (16 * 5), "Instances_1", oOrb);
 					}
 					
 					// Fancy generation

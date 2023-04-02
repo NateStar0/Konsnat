@@ -1,152 +1,158 @@
-/// @description Run everything
+/*
 
-//hasControl = true;
-
-image_xscale = 1;
-image_speed = 1;
-
-x = xstart;
-y = ystart;
-
-spd = 
-{
-	hsp : 
-	{
-		val : 0,
-		acc : 1,
-		mx : 4,
-		jmp: 4,
-		fric : 
-		{
-			onground : 0.5,
-			offground : 0.15
-		},
+		=== -- oKons -- ===
 		
-		frc : 0
-	},
+		Primary Player Object
+		
+		
+		
+		
+		
+		-- Methods -- 
+		
+		Abilities : Manages the orb when collected 
+		
+		Run : Manages movements and collisions
+		
+		Draw : Draws the character with their appropriate animation sprites
+
+*/
+
+	// Reset basic variables													
+																				
+	image_xscale = 1;															
+	image_speed = 1;															
+																				
+	x = xstart;																	
+	y = ystart;																	
+																				
+	// Cutscene control															
+																				
+	hasControl = true;															//	(Boolean) Indicator of whether player can move/use player
+																				
+	// Speed																	
+																				
+	hsp = 0;																	//	(Real) Horizontal speed
+																				
+	hspMaximum = 4;																//	(Real) Absolute maximum horizontal speed
+	hspJump = 4;																//	(Real) Absolute speed as player is ejected from wall
+	hspAcceleration = 1;														//	(Real) Acceleration constant
+	hspFrictionOnground = 0.5;													//	(Real) Friction constant while walking
+	hspFrictionOffground = 0.15;												//	(Real) Friction constant while jumping
+																				
+	hspFraction = 0;															//	(Real) Fraction for collisions
+																				
+																				
+	vsp = 0;																	//	(Real) vertical speed
 	
-	vsp :
-	{
-		val : 0,
-		grav : 
-		{
-			onwall : 0.1,
-			offwall : 0.3
-		},
-		
-		mx : 
-		{
-			offwall: 10,
-			onwall : 4
-		},
-		
-		boost :
-		{
-			offwall: -6,
-			onwall: -5,
-		},
-		
-		frc : 0
-	}
-}
-
-ability_data = 
-{
-	shard :
-	{
-		has_shard : false,
-		has_silence : false,
-		has_damage : false,
-		
-		angle : 0,
-		rotspd : 4,
-		spd : 8,
-		peek : 64,
-		
-		x : 0, 
-		y : 0,
-		
-		dist : 16,
-		resetdist : 16,
-		
-		thrown : false
-	}
+	vspGravityOnwall = 0.1;														//	(Real) Absolute acceleration due to gravity on wall
+	vspGravityOffWall = 0.3;													//	(Real) Absolute acceleration due to gravity in air
+	vspMaximumOnwall = 4;														//	(Real) Absolute maximum speed while falling mid air
+	vspMaximumOffwall = 10;														//	(Real) Absolute maximum speed while sliding on the wall
+	vspBoostOnwall = -5;														//	(Real) ΔSpeed from jumping off a wall
+	vspBoostOffwall = -6;														//	(Real) ΔSpeed from jumping off the floor
 	
-}
-
-jumpbuffer = 0;
-jumpdelay = 0;
-jumpdelaymx = 12;
-
-throwing = false;
-
-onground = false;
-onwall = 0;
+	vspFraction = 0;															//	(Real) Fraction for collisions
+																				
+	// Orb data																	
+																				
+	shardHasShard = false;														//	(Boolean) have we got the shard
+	shardHasSilence = false;													//	(Boolean) can the shard not produce noise
+	shardHasDamage = false;														//	(Boolean) can the shard deal dmg
+																				
+	shardAngle = 0;																//	(Real) Angle arround the player to draw / project the shard
+	shardRotationSpeed = 4;														//	(Real) change in angle per frame dA/dt
+	shardProjectionSpeed = 8;													//	(Real) change in distance per frame dD/dt
+																				
+	shardPeekOffset = 64;														//	(Real) camera offset while aiming the orb
+																				
+	shardX = 0;																	//	(Real) x position of the shard
+	shardY = 0;																	//	(Real) y position of the shard
+																				
+	shardDistance = 16;															//	(Real) offset of shard from center of player
+	shardResetDistance = 16;													//	(Real) reset distance, to fix previous variable after throwing.
+																				
+	shardThrown = false;														//	(Boolean) do we have the shard right now
+	throwing = false;															//	(Boolean) are we aiming the direction of the shard?
+																				
+	// Jump stuff 																
+																				
+	jumpbuffer = 0;																//	(Real) fuck
+	jumpdelay = 0;																//	(Real) i 
+	jumpdelaymx = 12;															//	(Real) dont remember
+																				
+																				
+	// Other Stuff ig															
+																				
+	onground = false;															//	(Boolean) Is the player touching the ground
+	onwall = 0;																	//	(Real) direction of any adjacent wall (-1 = left), 0 is none.
+	
+	
 
 abilities = function ()
 {
 	var in = global.input;
 	
 	// Shard
-	ability_data.shard.has_shard |= place_meeting(x, y, oOrb);
+	shardHasShard |= place_meeting(x, y, oOrb);
 	
-	if(ability_data.shard.has_shard)
+	if(shardHasShard)
 	{
-		if(ability_data.shard.thrown)
+		if(shardThrown)
 		{
-			ability_data.shard.dist += ability_data.shard.spd;
-			ability_data.shard.thrown = (ability_data.shard.dist < VW_WIDTH * 2)
+			shardDistance += shardProjectionSpeed;
+			shardThrown = (shardDistance < VW_WIDTH * 2)
 			
-			if(ability_data.shard.has_damage && place_meeting(ability_data.shard.x + lengthdir_x(ability_data.shard.dist, ability_data.shard.angle), ability_data.shard.y + lengthdir_y(ability_data.shard.dist, ability_data.shard.angle), pEnemy))
+			if(shardHasDamage && place_meeting(shardX + lengthdir_x(shardDistance, shardAngle), shardY + lengthdir_y(shardDistance, shardAngle), pEnemy))
 			{
-				instance_place(ability_data.shard.x + lengthdir_x(ability_data.shard.dist, ability_data.shard.angle), ability_data.shard.y + lengthdir_y(ability_data.shard.dist, ability_data.shard.angle), pEnemy).hp -= 1;
-				ability_data.shard.thrown = false;
+				instance_place(shardX + lengthdir_x(shardDistance, shardAngle), shardY + lengthdir_y(shardDistance, shardAngle), pEnemy).hp -= 1;
+				shardThrown = false;
 			}
 			
-			if(place_meeting(ability_data.shard.x + lengthdir_x(ability_data.shard.dist, ability_data.shard.angle), ability_data.shard.y + lengthdir_y(ability_data.shard.dist, ability_data.shard.angle), pWall))
+			if(place_meeting(shardX + lengthdir_x(shardDistance, shardAngle), shardY + lengthdir_y(shardDistance, shardAngle), pWall))
 			{
-				while(place_meeting(ability_data.shard.x + lengthdir_x(ability_data.shard.dist, ability_data.shard.angle), ability_data.shard.y + lengthdir_y(ability_data.shard.dist, ability_data.shard.angle), pWall))	
+				while(place_meeting(shardX + lengthdir_x(shardDistance, shardAngle), shardY + lengthdir_y(shardDistance, shardAngle), pWall))	
 				{
-					ability_data.shard.dist--;	
+					shardDistance--;	
 				}
 				
-				x = ability_data.shard.x + lengthdir_x(ability_data.shard.dist, ability_data.shard.angle);
-				y = ability_data.shard.y + lengthdir_y(ability_data.shard.dist, ability_data.shard.angle);
+				x = shardX + lengthdir_x(shardDistance, shardAngle);
+				y = shardY + lengthdir_y(shardDistance, shardAngle);
 				
-				ability_data.shard.thrown = false;
+				shardThrown = false;
 				
-				if(!ability_data.shard.has_silence)
+				if(!shardHasSilence)
 				{
 					create_shockwave(x, y, VW_WIDTH, 4);
 					shake_cam(2, 2)
 				}
 			}
 			
-			if(!ability_data.shard.thrown)
+			if(!shardThrown)
 			{
-				ability_data.shard.dist = ability_data.shard.resetdist;	
-				ability_data.shard.x = x;
-				ability_data.shard.y = y;
+				shardDistance = shardResetDistance;	
+				shardX = x;
+				shardY = y;
 			}
 		}
 		else
 		{
-			ability_data.shard.angle += (throwing) ?  (in[3][INPUTTYPE.HOLD] - in[2][INPUTTYPE.HOLD]) * -ability_data.shard.rotspd : ability_data.shard.rotspd;
-			ability_data.shard.x = x;
-			ability_data.shard.y = y;
+			shardAngle += (throwing) ?  (in[3][INPUTTYPE.HOLD] - in[2][INPUTTYPE.HOLD]) * -shardRotationSpeed : shardRotationSpeed;
+			shardX = x;
+			shardY = y;
 			
-			oCamera.offset_x = (throwing) ? lengthdir_x(ability_data.shard.peek, ability_data.shard.angle) : 0;
-			oCamera.offset_y = (throwing) ? clamp(lengthdir_y(ability_data.shard.peek, ability_data.shard.angle), -ability_data.shard.peek, 0) : 0;
+			oCamera.offset_x = (throwing) ? lengthdir_x(shardPeekOffset, shardAngle) : 0;
+			oCamera.offset_y = (throwing) ? clamp(lengthdir_y(shardPeekOffset, shardAngle), -shardPeekOffset, 0) : 0;
 			
-			if(ability_data.shard.angle > 360) ability_data.shard.angle -= 360;
-			if(ability_data.shard.angle < 0) ability_data.shard.angle += 360;
+			if(shardAngle > 360) shardAngle -= 360;
+			if(shardAngle < 0) shardAngle += 360;
 			
-			oCamera.state = (throwing) ? camera_state.free : oCamera.restore_state;
+			//oCamera.state = (throwing) ? camera_state.free : oCamera.restore_state;
 		}
 		
 		if((in[1][INPUTTYPE.RELEASE]))
 		{
-			ability_data.shard.thrown = true;
+			shardThrown = true;
 			shake_cam(3, 5);
 		}
 	}
@@ -167,24 +173,24 @@ run = function ()
 	jumpdelay = max(0, jumpdelay - 1);
 	if(jumpdelay == 0)
 	{
-		var hmx = (onwall == 0) ? spd.hsp.mx : spd.hsp.jmp;
+		var hmx = (onwall == 0) ? hspMaximum : hspJump;
 		
-		spd.hsp.val += (!throwing) ? dir * spd.hsp.acc : 0;
-		spd.hsp.val = clamp((dir == 0) ? approach(spd.hsp.val, 0, (onground) ? spd.hsp.fric.onground : spd.hsp.fric.offground) : spd.hsp.val, -hmx, hmx);
+		hsp += (!throwing) ? dir * hspAcceleration : 0;
+		hsp = clamp((dir == 0) ? approach(hsp, 0, (onground) ? hspFrictionOnground : hspFrictionOffground) : hsp, -hmx, hmx);
 	}
 	
 	if(onwall != 0 && !onground && (in[0][INPUTTYPE.HOLD]))
 	{
-		spd.hsp.val = -onwall * spd.hsp.jmp;
-		spd.vsp.val = spd.vsp.boost.onwall
+		hsp = -onwall * hspJump;
+		vsp = vspBoostOnwall;
 	
-		spd.hsp.frc = 0;
-		spd.vsp.frc = 0;
+		hspFraction = 0;
+		vspFraction = 0;
 		
 		jumpdelay = jumpdelaymx
 	}
 	
-	spd.vsp.val += (!onground) ? ((onwall == 0) ? spd.vsp.grav.offwall : spd.vsp.grav.offwall) : 0;
+	vsp += (!onground) ? ((onwall == 0) ? vspGravityOffWall : vspGravityOnwall) : 0;
 	
 	if(jumpbuffer > 0)
 	{
@@ -193,51 +199,51 @@ run = function ()
 		if(in[0][INPUTTYPE.HOLD])
 		{
 			jumpbuffer = 0;
-			spd.vsp.val = spd.vsp.boost.offwall;
-			spd.vsp.frc = 0;
+			vsp = vspBoostOffwall;
+			vspFraction = 0;
 		}
 	}
 	
-	var vmx = (onwall == 0) ? spd.vsp.mx.offwall : spd.vsp.mx.onwall;
-	spd.vsp.val = clamp(spd.vsp.val, -vmx, vmx);
+	var vmx = (onwall == 0) ? vspMaximumOffwall : vspMaximumOnwall;
+	vsp = clamp(vsp, -vmx, vmx);
 	
-	spd.hsp.val += spd.hsp.frc;
-	spd.vsp.val += spd.vsp.frc;
-	spd.hsp.frc = frac(spd.hsp.val);
-	spd.vsp.frc = frac(spd.vsp.val);
-	spd.hsp.val -= spd.hsp.frc;
-	spd.vsp.val -= spd.vsp.frc;
+	hsp += hspFraction;
+	vsp += vspFraction;
+	hspFraction = frac(hsp);
+	vspFraction = frac(vsp);
+	hsp -= hspFraction;
+	vsp -= vspFraction;
 	
-	image_xscale = (spd.hsp.val != 0) ? sign(spd.hsp.val) : image_xscale;
-	image_speed = abs(sign(spd.hsp.val));
+	image_xscale = (hsp != 0) ? sign(hsp) : image_xscale;
+	image_speed = abs(sign(hsp));
 	
-	if(place_meeting(x + spd.hsp.val, y, pWall))
+	if(place_meeting(x + hsp, y, pWall))
 	{
-		while(!place_meeting(x + sign(spd.hsp.val), y, pWall))
+		while(!place_meeting(x + sign(hsp), y, pWall))
 		{
-			x += sign(spd.hsp.val)	
+			x += sign(hsp)	
 		}
 		
-		spd.hsp.val = 0;
-		spd.hsp.frc = 0;
+		hsp = 0;
+		hspFraction = 0;
 	}
 	
-	x += spd.hsp.val;
+	x += hsp;
 	
-	if(place_meeting(x, y + spd.vsp.val, pWall))
+	if(place_meeting(x, y + vsp, pWall))
 	{
-		while(!place_meeting(x, y + sign(spd.vsp.val), pWall))
+		while(!place_meeting(x, y + sign(vsp), pWall))
 		{
-			y += sign(spd.vsp.val);
+			y += sign(vsp);
 		}
 		
-		spd.vsp.val = 0;
-		spd.vsp.frc = 0;
+		vsp = 0;
+		vspFraction = 0;
 		
 		shake_cam(3, 5);
 	}
 	
-	y += spd.vsp.val;
+	y += vsp;
 	
 	if(onground) jumpbuffer = 6;
 	
@@ -248,5 +254,5 @@ draw = function ()
 {
 	draw_self();
 	
-	if(ability_data.shard.has_shard) draw_sprite(sOrb, 0, ability_data.shard.x + lengthdir_x(ability_data.shard.dist, ability_data.shard.angle), ability_data.shard.y + lengthdir_y(ability_data.shard.dist, ability_data.shard.angle));
+	if(shardHasShard) draw_sprite(sOrb, 0, shardX + lengthdir_x(shardDistance, shardAngle), shardY + lengthdir_y(shardDistance, shardAngle));
 }
