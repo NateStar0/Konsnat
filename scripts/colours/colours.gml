@@ -12,6 +12,8 @@
 #macro cc_light $51abcf // 207, 171, 81 (cfab51)
 #macro cc_white $FFFFFF // 255, 255, 255 (FFFFFF)
 
+// color = (red & 0xff) | ((green & 0xff) << 8) | (blue & 0xff) << 16)
+
 global.coloursValues = 
 [
 	colour_get_values(cc_black),
@@ -47,7 +49,7 @@ function colours()
 	oInit.shHandleColourReplacementBrighter = shader_get_uniform(shDefault, "colourReplacementBrighter");
 	oInit.shHandleColourReplacementBrighest = shader_get_uniform(shDefault, "colourReplacementBrighest");
 	oInit.shHandleColourReplacementWhite = shader_get_uniform(shDefault, "colourReplacementWhite");
-
+	 
 	oInit.shHandleColourBlack = shader_get_uniform(shDefault, "colourBlack");
 	oInit.shHandleColourDarkest = shader_get_uniform(shDefault, "colourDarkest");
 	oInit.shHandleColourDarker = shader_get_uniform(shDefault, "colourDarker");
@@ -64,7 +66,7 @@ function predraw_colour()
 	shader_set_uniform_f(oInit.shHandleColourReplacementBrighter,	global.coloursValues[global.colourMap[3]][0] / 255, global.coloursValues[global.colourMap[3]][1] / 255, global.coloursValues[global.colourMap[3]][2] / 255, 1);
 	shader_set_uniform_f(oInit.shHandleColourReplacementBrighest,	global.coloursValues[global.colourMap[4]][0] / 255, global.coloursValues[global.colourMap[4]][1] / 255, global.coloursValues[global.colourMap[4]][2] / 255, 1);
 	shader_set_uniform_f(oInit.shHandleColourReplacementWhite,		global.coloursValues[global.colourMap[5]][0] / 255, global.coloursValues[global.colourMap[5]][1] / 255, global.coloursValues[global.colourMap[5]][2] / 255, 1);
-	
+						  
 	shader_set_uniform_f(oInit.shHandleColourBlack,		 global.coloursValues[0][0] / 255, global.coloursValues[0][1] / 255, global.coloursValues[0][2] / 255, 1);
 	shader_set_uniform_f(oInit.shHandleColourDarkest,	 global.coloursValues[1][0] / 255, global.coloursValues[1][1] / 255, global.coloursValues[1][2] / 255, 1);
 	shader_set_uniform_f(oInit.shHandleColourDarker,	 global.coloursValues[2][0] / 255, global.coloursValues[2][1] / 255, global.coloursValues[2][2] / 255, 1);

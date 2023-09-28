@@ -1,20 +1,9 @@
 /// @description 
 
-for(var i = 0; i < array_length(keys); i++)
+for(var i = 0; i < keyCount; i++)
 {
-	global.input[i] = [keyboard_check_pressed(keys[i]), keyboard_check(keys[i]), keyboard_check_released(keys[i])];
+	global.input[i][0] = keyboard_check_pressed(keys[i])
+	global.input[i][1] = keyboard_check(keys[i])
 }
 
-global.raindir = 270 + global.rainoffset
-
-global.rainoffset += (mouse_wheel_up() - mouse_wheel_down())
-
-if(keyboard_check_pressed(ord("P")))
-{
-	room_restart();
-}
-
-if(keyboard_check_pressed(ord("O")))
-{
-	generate.init();
-}
+oKons.hp -= keyboard_check_pressed(ord("O"))

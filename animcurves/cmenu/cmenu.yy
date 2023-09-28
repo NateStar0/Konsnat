@@ -11,7 +11,7 @@
   ],
   "function": 2,
   "parent": {
-    "name": "Konsnat",
-    "path": "Konsnat.yyp",
+    "name": "Menu",
+    "path": "folders/Menu.yy",
   },
 }

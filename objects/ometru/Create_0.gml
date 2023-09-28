@@ -2,12 +2,13 @@
 
 depth = -10000.00;
 
-oCamera.x = VW_WIDTH;
-oCamera.y = 0;
-oCamera.state = camera_state.lock;
+camera_set_view_pos(CAMERA, VW_WIDTH, 0);
 
-oKons.hasControl = false;
-oKons.visible = false;
+if(instance_exists(oKons))
+{
+	oKons.actionState = "idle"
+	oKons.visible = false;
+}
 
 global.pausable = false;
 
@@ -36,9 +37,14 @@ changeMenu = function()
 start = function()
 {
 	oCamera.colour_state = colour_states.toBlack;
-	instance_create_depth(x, y, depth, oGenerator);
+	instance_create_depth(x, y, depth, oStarter);
+	oKons.x = 2.5 * 320;
+	oKons.y = 112;
+	
 	//generate.init();	
 }
+
+layer_set_visible(layer_get_id("Paralax_1"), false);
 
 /**
 	@param {String} text 
@@ -106,9 +112,9 @@ render = function ()
 	
 	draw_set_text(cc_white, fa_center, fa_middle);
 	
-	var str = (index == 0) ? "" : "<";
+	var str = (index == 0) ? "" : "< ";
 	str += menu[index].txt;
-	str += (index == array_length(menu) - 1) ? "" : ">";
+	str += (index == array_length(menu) - 1) ? "" : " >";
 	
 	draw_text(320 / 2, 180 - 16, str);
 	

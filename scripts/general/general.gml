@@ -78,22 +78,30 @@ function chance(weight)
 	return weight > random(1)
 }
 
-function wave(argument0, argument1, argument2, argument3) 
+/**
+	@param	{Real} low
+	@param	{Real} high
+	@param	{Real} duration
+	@param	{Real} offset
+	
+	@return {Real}
+*/
+
+function wave(low, high, duration, offset) 
 {
-	var a4 = (argument1 - argument0)* 0.5
-	return argument0 + a4 + sin((((current_time * 0.001)+ argument2 * argument3)/ argument2)* (pi*2))+a4
+	var waveV = (high - low) * 0.5;
+	return low + waveV + sin((((current_time * 0.001) + duration * offset) / duration) * (pi * 2)) * waveV;
 }
+
+/**
+	@param {Real} frames
+	@return {Real} seconds
+*/
 
 function seconds(frames) {
-	return frames * game_get_speed(gamespeed_fps);
+	return frames * FPS_LOCKED;
 }
 
-function camera_set_target(target) {
-	with(oCamera)
-	{
-		follow = target
-	}
-}
 
 function log() 
 {
@@ -105,15 +113,18 @@ function log()
 	show_debug_message(str);
 }
 
-/**
-@desc Returns the provided string with a capital letter in the first index.
-@param {String} str
-@returns {String}
-*/
 
-function upperfirst(str)
+function shake_cam(time, mag) 
 {
-    return string_upper(string_char_at(str, 1)) + string_copy(str, 2, string_length(str) - 1);
+	with(oCamera)
+	{
+		if(time > shakeRem)
+		{
+			shakeLen = time;
+			shakeRem = time;
+			shakeMag = mag;
+		}
+	}
 }
 
 function pick_weighted(arr)
@@ -147,5 +158,4 @@ function pick_weighted(arr)
 	
 	return items[itemCount - 1];
 }
-
 

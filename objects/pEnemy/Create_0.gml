@@ -1,3 +1,4 @@
 /// @description 
-hp = 0;
 
+hp = 0;
+hsp = 0;

@@ -26,8 +26,8 @@
   "properties": [],
   "solid": false,
   "spriteId": {
-    "name": "sWaterfall",
-    "path": "sprites/sWaterfall/sWaterfall.yy",
+    "name": "sTransparentTemporary",
+    "path": "sprites/sTransparentTemporary/sTransparentTemporary.yy",
   },
   "spriteMaskId": null,
   "visible": false,

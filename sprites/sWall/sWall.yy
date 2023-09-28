@@ -25,8 +25,8 @@
   "nineSlice": null,
   "origin": 0,
   "parent": {
-    "name": "Konsnat",
-    "path": "Konsnat.yyp",
+    "name": "Train",
+    "path": "folders/Train.yy",
   },
   "preMultiplyAlpha": false,
   "sequence": {
